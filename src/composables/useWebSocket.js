@@ -21,8 +21,8 @@ export function useWebSocket(url) {
     );
   };
 
-  const send = (message) => {
-    return wsService.send(message);
+  const send = (conversationId, content) => {
+    return wsService.send(conversationId, content);
   };
 
   const close = () => {

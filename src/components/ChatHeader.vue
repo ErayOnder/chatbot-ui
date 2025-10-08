@@ -1,6 +1,6 @@
 <template>
   <div class="chat-header">
-    <h1>Chatbot UI</h1>
+    <h1>{{ conversationTitle || 'Chatbot UI' }}</h1>
     <div class="status" :class="{ connected: isConnected }">
       Status: {{ isConnected ? 'Connected' : 'Disconnected' }}
     </div>
@@ -14,6 +14,10 @@ export default {
     isConnected: {
       type: Boolean,
       required: true,
+    },
+    conversationTitle: {
+      type: String,
+      default: null,
     },
   },
 };

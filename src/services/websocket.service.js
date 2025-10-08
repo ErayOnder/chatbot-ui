@@ -45,8 +45,12 @@ export class WebSocketService {
     }
   }
 
-  send(message) {
+  send(conversationId, content) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      const message = JSON.stringify({
+        conversationId,
+        content,
+      });
       this.ws.send(message);
       return true;
     }

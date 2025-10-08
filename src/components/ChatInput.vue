@@ -1,6 +1,9 @@
 <template>
   <div class="chat-input-container">
-    <div class="input-wrapper">
+    <div v-if="!hasActiveConversation" class="no-conversation-message">
+      Please create or select a conversation to start chatting
+    </div>
+    <div v-else class="input-wrapper">
       <input
         v-model="inputText"
         @keyup.enter="handleSend"
@@ -34,6 +37,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    hasActiveConversation: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['send-message'],
   setup(props, { emit }) {
@@ -41,7 +48,7 @@ export default {
     const messageInput = ref(null);
 
     const handleSend = () => {
-      if (props.isConnected && inputText.value.trim() && !props.isLoading) {
+      if (props.isConnected && inputText.value.trim() && !props.isLoading && props.hasActiveConversation) {
         emit('send-message', inputText.value.trim());
         inputText.value = '';
       }
@@ -107,5 +114,12 @@ export default {
 .send-button:disabled {
   background-color: #6c757d;
   cursor: not-allowed;
+}
+
+.no-conversation-message {
+  text-align: center;
+  color: #6c757d;
+  padding: 1rem;
+  font-size: 0.95rem;
 }
 </style>
