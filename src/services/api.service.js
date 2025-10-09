@@ -7,7 +7,7 @@ export class ApiService {
    * @param {string} modelName - Model name (optional, defaults to "llama3.2")
    * @returns {Promise<Object>} Created conversation
    */
-  async createConversation(title = 'New Chat', modelName = 'llama3.2') {
+  async createConversation() {
     try {
       console.log('Fetching:', `${API_BASE_URL}/conversations`);
       const response = await fetch(`${API_BASE_URL}/conversations`, {
@@ -15,7 +15,6 @@ export class ApiService {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ title, modelName }),
       });
 
       console.log('Response status:', response.status);

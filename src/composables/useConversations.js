@@ -26,11 +26,11 @@ export function useConversations() {
   /**
    * Create a new conversation
    */
-  const createConversation = async (title = 'New Chat', modelName = 'llama3.2') => {
+  const createConversation = async () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const newConversation = await apiService.createConversation(title, modelName);
+      const newConversation = await apiService.createConversation();
       conversations.value.unshift(newConversation); // Add to beginning of list
       currentConversation.value = newConversation;
       return newConversation;

@@ -66,40 +66,39 @@ export default {
       try {
         const data = JSON.parse(event.data);
 
-        // Backend returns: { userMessage: {...}, assistantMessage: {...}, conversationId: ... }
-        if (data.assistantMessage) {
-          // Check if this conversation's title needs updating (first message)
-          // Do this BEFORE checking current conversation to handle title updates even when switched away
-          const needsTitleUpdate = data.userMessage && data.conversationId;
-          if (needsTitleUpdate) {
-            // Reload the conversation list to get updated title from backend
-            // We don't need to reload the conversation itself unless it's currently selected
-            setTimeout(async () => {
-              await loadConversations(); // Refresh sidebar to show updated title
-            }, 100);
-          }
+        // Handle error responses
+        if (data.error) {
+          console.error('Received error from server:', data.error);
+          setLoading(false);
+          alert('Error: ' + data.error);
+          return;
+        }
+
+        // Backend returns: { botMessage: { id, conversationId, role, content, createdAt } }
+        if (data.botMessage) {
+          const conversationId = data.botMessage.conversationId;
+
+          // Check if this is the first message (might need title update)
+          // We'll reload the conversation list to get any updated title
+          setTimeout(async () => {
+            await loadConversations(); // Refresh sidebar to show updated title
+          }, 100);
 
           // IMPORTANT: Only add message if it belongs to the currently selected conversation
           // This prevents race conditions when user switches conversations while bot is typing
-          if (currentConversation.value && data.conversationId === currentConversation.value.id) {
+          if (currentConversation.value && conversationId === currentConversation.value.id) {
             // Message belongs to current conversation - stop loading and add it
             setLoading(false);
-            addMessage(data.assistantMessage.content, 'bot', data.assistantMessage.id);
+            addMessage(data.botMessage.content, 'bot', data.botMessage.id);
 
-            // If title was updated, also reload the current conversation to update the header
-            if (needsTitleUpdate) {
-              setTimeout(async () => {
-                await selectConversation(data.conversationId);
-              }, 100);
-            }
+            // Reload current conversation to update the header with new title
+            setTimeout(async () => {
+              await selectConversation(conversationId);
+            }, 100);
           } else {
             // Message is for a different conversation - just ignore it
-            console.log('Received message for different conversation, ignoring:', data.conversationId);
+            console.log('Received message for different conversation, ignoring:', conversationId);
           }
-        } else if (data.response) {
-          // Fallback for old format
-          setLoading(false);
-          addMessage(data.response, 'bot');
         }
       } catch (error) {
         console.error('Failed to parse message:', error);
@@ -113,7 +112,7 @@ export default {
         console.error('No active conversation');
         return;
       }
-
+      // TODO: Add message to the conversation
       addMessage(message, 'user');
       const success = send(currentConversation.value.id, message);
       if (success) {

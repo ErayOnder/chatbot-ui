@@ -48,8 +48,8 @@ export class WebSocketService {
   send(conversationId, content) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       const message = JSON.stringify({
-        conversationId,
-        content,
+        conversationId: conversationId,
+        userMessage: content,
       });
       this.ws.send(message);
       return true;

@@ -43,27 +43,6 @@ export function useChat() {
     return message;
   };
 
-  /**
-   * Add message pair from backend response
-   * Backend format: { userMessage: {...}, assistantMessage: {...} }
-   */
-  const addMessagePair = (messagePair) => {
-    if (messagePair.userMessage) {
-      addMessage(
-        messagePair.userMessage.content,
-        'user',
-        messagePair.userMessage.id
-      );
-    }
-    if (messagePair.assistantMessage) {
-      addMessage(
-        messagePair.assistantMessage.content,
-        'bot',
-        messagePair.assistantMessage.id
-      );
-    }
-  };
-
   const clearMessages = () => {
     messages.value = [];
   };
@@ -76,7 +55,6 @@ export function useChat() {
     messages,
     isLoading,
     addMessage,
-    addMessagePair,
     loadMessages,
     clearMessages,
     setLoading,
