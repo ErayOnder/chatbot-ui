@@ -74,27 +74,20 @@ export default {
           return;
         }
 
-        // Backend returns: { botMessage: { id, conversationId, role, content, createdAt } }
+        // Backend returns: { botMessage: {...}, conversationTitle: "..." }
         if (data.botMessage) {
           const conversationId = data.botMessage.conversationId;
 
-          // Check if this is the first message (might need title update)
-          // We'll reload the conversation list to get any updated title
-          setTimeout(async () => {
-            await loadConversations(); // Refresh sidebar to show updated title
-          }, 100);
+          // Update title in local state if provided (async title update)
+          if (data.conversationTitle) {
+            console.log('Received updated title:', data.conversationTitle);
+            updateConversationTitle(conversationId, data.conversationTitle);
+          }
 
-          // IMPORTANT: Only add message if it belongs to the currently selected conversation
-          // This prevents race conditions when user switches conversations while bot is typing
+          // Only add message if it belongs to the currently selected conversation to prevent race conditions when user switches conversations while bot is typing
           if (currentConversation.value && conversationId === currentConversation.value.id) {
-            // Message belongs to current conversation - stop loading and add it
             setLoading(false);
             addMessage(data.botMessage.content, 'bot', data.botMessage.id);
-
-            // Reload current conversation to update the header with new title
-            setTimeout(async () => {
-              await selectConversation(conversationId);
-            }, 100);
           } else {
             // Message is for a different conversation - just ignore it
             console.log('Received message for different conversation, ignoring:', conversationId);
@@ -103,7 +96,6 @@ export default {
       } catch (error) {
         console.error('Failed to parse message:', error);
         setLoading(false);
-        addMessage(event.data, 'bot');
       }
     };
 
